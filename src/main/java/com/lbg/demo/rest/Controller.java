@@ -3,6 +3,8 @@ package com.lbg.demo.rest;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,12 +26,13 @@ public class Controller {
 	private List<Motorbike> motorbikes = new ArrayList<>();
 
 	@PostMapping("/create")
-	public String createMotorbike(@RequestBody Motorbike newMotorbike) {
+	public ResponseEntity<Motorbike> createMotorbike(@RequestBody Motorbike newMotorbike) {
 		this.motorbikes.add(newMotorbike);
-		return motorbikes.toString();
-
 		// This Returns the last Motorbike in the list
-		// return.this.motorbikes.get(this.motorbikes.size() -1);
+		Motorbike body = this.motorbikes.get(this.motorbikes.size() - 1);
+		// return motorbikes.toString();
+		return new ResponseEntity<Motorbike>(body, HttpStatus.CREATED);
+		// This shows a return Status (200,202,400,405)
 
 	}
 
@@ -41,16 +44,28 @@ public class Controller {
 
 	}
 
-// 'id' -> index (for now)
+// 'id' -> index (for now) - Original Text
 
-	@GetMapping("/get{id}")
-	public Motorbike getMotorbike(@PathVariable int id) {
-		return this.motorbikes.get(id);
+//	@GetMapping("/get/{id}")
+//	public Motorbike getMotorbike(@PathVariable int id) {
+//		return this.motorbikes.get(id);
+//	}
+
+	// 'id' -> index - New Text with If Statement
+
+	@GetMapping("/get/{id}")
+	public ResponseEntity<Motorbike> getMotorike(@PathVariable int id) {
+		if (id < 0 || id >= this.motorbikes.size()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		Motorbike found = this.motorbikes.get(id);
+
+		return ResponseEntity.ok(found);
 	}
 
 // delete by ID
 
-	@DeleteMapping("/delete{id}")
+	@DeleteMapping("/delete/{id}")
 	public Motorbike remove(@PathVariable int id) {
 		return this.motorbikes.get(id);
 
@@ -63,5 +78,7 @@ public class Controller {
 		return this.motorbikes.set(id, newMotorbike);
 
 	}
+
+//status codes
 
 }
