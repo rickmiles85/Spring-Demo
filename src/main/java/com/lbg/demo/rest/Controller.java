@@ -1,9 +1,7 @@
 package com.lbg.demo.rest;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lbg.demo.domain.Motorbike;
+import com.lbg.demo.services.MotorbikeService;
 
 @RestController
 
@@ -21,18 +20,20 @@ import com.lbg.demo.domain.Motorbike;
 
 public class Controller {
 
-	// Creates an Array List of Motorbikes
+	private MotorbikeService service;
 
-	private List<Motorbike> motorbikes = new ArrayList<>();
+// Creates an Array List of Motorbikes
+
+//	Provides a Constructor to link the Service logic across to theController
+
+	public Controller(MotorbikeService service) {
+		super();
+		this.service = service;
+	}
 
 	@PostMapping("/create")
 	public ResponseEntity<Motorbike> createMotorbike(@RequestBody Motorbike newMotorbike) {
-		this.motorbikes.add(newMotorbike);
-		// This Returns the last Motorbike in the list
-		Motorbike body = this.motorbikes.get(this.motorbikes.size() - 1);
-		// return motorbikes.toString();
-		return new ResponseEntity<Motorbike>(body, HttpStatus.CREATED);
-		// This shows a return Status (200,202,400,405)
+		return this.service.createMotorbike(newMotorbike);
 
 	}
 
@@ -40,7 +41,7 @@ public class Controller {
 
 	@GetMapping("/get")
 	public List<Motorbike> getMotorbikes() {
-		return motorbikes;
+		return this.service.getMotorbikes();
 
 	}
 
@@ -55,27 +56,22 @@ public class Controller {
 
 	@GetMapping("/get/{id}")
 	public ResponseEntity<Motorbike> getMotorike(@PathVariable int id) {
-		if (id < 0 || id >= this.motorbikes.size()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		Motorbike found = this.motorbikes.get(id);
-
-		return ResponseEntity.ok(found);
+		return this.service.getMotorbike(id);
 	}
 
 // delete by ID
 
-	@DeleteMapping("/delete/{id}")
-	public Motorbike remove(@PathVariable int id) {
-		return this.motorbikes.get(id);
+	@DeleteMapping("/remove/{id}")
+	public boolean remove(@PathVariable int id) {
+		return this.service.remove(id);
 
 	}
 
 // Updating ID
 
 	@PutMapping("/update/{id}")
-	public Motorbike update(@PathVariable int id, @RequestBody Motorbike newMotorbike) {
-		return this.motorbikes.set(id, newMotorbike);
+	public ResponseEntity<Motorbike> update(@PathVariable int id, @RequestBody Motorbike newMotorbike) {
+		return this.service.update(id, newMotorbike);
 
 	}
 
